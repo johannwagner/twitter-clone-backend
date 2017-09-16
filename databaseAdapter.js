@@ -1,4 +1,4 @@
-import secret from "./secret";
+const secret = require("./secret");
 
 const mysql = require('promise-mysql');
 const _ = require('lodash');
