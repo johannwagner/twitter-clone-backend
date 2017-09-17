@@ -23,7 +23,7 @@ class DatabaseAdapter {
 
         let dbStatement;
         let baseString = 'SELECT t.*, u.displayName FROM tweets t LEFT JOIN users u ON u.id = t.ownerId WHERE t.referenceTweetId ' +
-            (referenceTweetIds ? 'IN (' + this.poolPromise.escape(referenceTweetIds) + ')': 'IS NULL');
+            (referenceTweetIds && referenceTweetIds.length > 0 ? ('IN (' + this.poolPromise.escape(referenceTweetIds) + ')' ): 'IS NULL');
         let sortString = 'ORDER BY t.id DESC';
 
 
@@ -39,6 +39,11 @@ class DatabaseAdapter {
         return dbStatement.then((tweets) => {
             let tweetIds = tweets.map((t) => t.id);
             retTweets = tweets;
+
+            if(tweets.length <= 0) {
+                return [];
+            }
+
             return this.poolPromise.query('SELECT r.*, u.displayName FROM reactions r LEFT JOIN users u ON u.id = r.ownerId WHERE r.tweetId IN (?)', [tweetIds]);
         }).then((reactions) => {
             retTweets.forEach((tweet) => {
